@@ -18,16 +18,16 @@ jobs:
 
     - name: Setup depot_tools
       run: |
-        git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+        git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git --depth 1 --no-checkout
         echo "$PWD/depot_tools" >> $GITHUB_PATH
         echo "DEPOT_TOOLS_UPDATE=0" >> $GITHUB_ENV
 
     - name: Fetch Chromium (Android)
       run: |
         mkdir chromium && cd chromium
-        fetch android
+        fetch --no-history android
         cd src
-        gclient sync
+        gclient sync --no-history --with_branch_heads
 
     - name: Configure GN for WebView
       working-directory: chromium/src
