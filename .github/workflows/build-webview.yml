@@ -18,7 +18,7 @@ jobs:
 
     - name: Setup depot_tools
       run: |
-        git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git --depth 1 --no-checkout
+        git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git --depth 1
         echo "$PWD/depot_tools" >> $GITHUB_PATH
         echo "DEPOT_TOOLS_UPDATE=0" >> $GITHUB_ENV
 
