@@ -1,0 +1,57 @@
+name: Build Android WebView
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Install Dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y python3 python3-pip git curl openjdk-11-jdk build-essential lsb-release
+
+    - name: Setup depot_tools
+      run: |
+        git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+        echo "$PWD/depot_tools" >> $GITHUB_PATH
+        echo "DEPOT_TOOLS_UPDATE=0" >> $GITHUB_ENV
+
+    - name: Fetch Chromium (Android)
+      run: |
+        mkdir chromium && cd chromium
+        fetch android
+        cd src
+        gclient sync
+
+    - name: Configure GN for WebView
+      working-directory: chromium/src
+      run: |
+        gn gen out/Default --args='
+          target_os="android"
+          target_cpu="arm64"
+          is_debug=false
+          is_component_build=false
+          symbol_level=0
+          enable_nacl=false
+          use_jumbo_build=true
+          proprietary_codecs=false
+          ffmpeg_branding="Chrome"
+        '
+
+    - name: Build System WebView
+      working-directory: chromium/src
+      run: |
+        autoninja -C out/Default system_webview_apk
+
+    - name: Upload APK artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: webview
+        path: |
+          chromium/src/out/Default/apks/SystemWebView.apk
