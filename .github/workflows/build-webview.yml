@@ -12,10 +12,18 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v4
 
-    - name: Install Dependencies
+    - name: Install Dependencies (Python 3.10)
       run: |
         sudo apt update
-        sudo apt install -y python3 python3-pip git curl openjdk-11-jdk build-essential lsb-release
+        sudo apt install -y software-properties-common
+        sudo add-apt-repository ppa:deadsnakes/ppa -y
+        sudo apt update
+        sudo apt install -y python3.10 python3.10-distutils python3.10-dev git curl openjdk-11-jdk build-essential lsb-release
+        sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1
+        curl -sS https://bootstrap.pypa.io/get-pip.py | sudo python3.10
+
+    - name: Check Python version
+      run: python3 --version
 
     - name: Setup depot_tools
       run: |
